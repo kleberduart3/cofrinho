@@ -203,7 +203,7 @@ let sel=new Set();
 let infoNum=null;
 
 async function rpc(fn,args){
-  const r=await fetch(SUPA_URL+'/rest/v1/rpc/'+fn,{method:'POST',headers:{'apikey':SUPA_KEY,'Authorization':'Bearer '+SUPA_KEY,'Content-Type':'application/json'},body:JSON.stringify(args)});
+  const r=await fetch(SUPA_URL+'/rest/v1/rpc/'+fn,{method:'POST',headers:{'apikey':SUPA_KEY,'Authorization':'Bearer '+SUPA_KEY,'Content-Type':'application/json','Content-Profile':'cofrinho','Accept-Profile':'cofrinho'},body:JSON.stringify(args)});
   if(!r.ok)throw new Error((await r.text())||r.status);
   return r.json();
 }
@@ -230,7 +230,7 @@ function normKey(k){k=(k||'').trim();const d=k.replace(/\D/g,'');
 async function entrar(codigo){
   $('loginErr').hidden=true;
   try{
-    const r=await rpc('cofrinho_info',{p_codigo:codigo});
+    const r=await rpc('info',{p_codigo:codigo});
     if(!r.length){$('loginErr').textContent='Código não encontrado. Confira as letras e os traços.';$('loginErr').hidden=false;show('vLogin');return;}
     info=r[0];loc.codigo=codigo.trim().toLowerCase();saveLoc();
     if(!loc.pessoa||!info.pessoas.includes(loc.pessoa))escolherPessoa();else iniciar();
@@ -257,7 +257,7 @@ async function carregar(){
   if(!loc.codigo)return;
   $('sync').textContent='Atualizando…';
   try{
-    const r=await rpc('cofrinho_listar',{p_codigo:loc.codigo});
+    const r=await rpc('listar',{p_codigo:loc.codigo});
     pagos={};r.forEach(x=>pagos[x.numero]={pessoa:x.pessoa,pago_em:x.pago_em});
     for(const n of [...sel])if(pagos[n])sel.delete(n);
     $('sync').textContent='Atualizado às '+new Date().toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'});
@@ -326,7 +326,7 @@ function abrirPagar(){
 async function confirmar(){
   const arr=[...sel];$('btnConfirm').disabled=true;
   try{
-    await rpc('cofrinho_pagar',{p_codigo:loc.codigo,p_numeros:arr,p_pessoa:loc.pessoa});
+    await rpc('pagar',{p_codigo:loc.codigo,p_numeros:arr,p_pessoa:loc.pessoa});
     sel.clear();$('shPay').hidden=true;toast('Pagamento registrado para '+loc.pessoa);await carregar();
   }catch(e){$('payErr').textContent='Não consegui salvar. Verifique a internet e toque de novo.';$('payErr').hidden=false;}
   $('btnConfirm').disabled=false;
@@ -341,7 +341,7 @@ function abrirInfo(i){
   $('shInfo').hidden=false;
 }
 async function desmarcar(){
-  try{await rpc('cofrinho_desmarcar',{p_codigo:loc.codigo,p_numeros:[infoNum]});$('shInfo').hidden=true;toast('Número '+infoNum+' desmarcado');await carregar();}
+  try{await rpc('desmarcar',{p_codigo:loc.codigo,p_numeros:[infoNum]});$('shInfo').hidden=true;toast('Número '+infoNum+' desmarcado');await carregar();}
   catch(e){toast('Não consegui desmarcar. Tente de novo.');}
 }
 
