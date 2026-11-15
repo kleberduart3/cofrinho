@@ -125,6 +125,45 @@ input,select{font:inherit;font-weight:500;padding:12px 14px;border-radius:14px;b
 .install button{flex:none;padding:10px 16px}
 .steps{margin:0;padding-left:20px;display:flex;flex-direction:column;gap:8px}
 @media (prefers-reduced-motion:reduce){button{transition:none}}
+/* meta semanal */
+.goal{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:12px 0;border-top:1px solid var(--line)}
+.goal:first-child{border-top:0;padding-top:0}
+.gl{display:flex;flex-direction:column;gap:2px;min-width:0}
+.gl b{font-weight:700;font-size:1.05rem;letter-spacing:-.02em}
+.gl b em{font-style:normal;color:var(--muted);font-weight:600;font-size:.8rem}
+.gl small{color:var(--muted);font-weight:600;font-size:.8rem}
+.dots{display:flex;gap:6px;flex:none}
+.dot{width:26px;height:26px;border-radius:50%;background:repeating-linear-gradient(135deg,var(--line) 0 3px,transparent 3px 6px);display:block}
+.dot.on{background:var(--ink)}
+.dot.on.k1{background:var(--sage)}
+.dot.on.k2{background:var(--lemon)}
+.fc{margin-top:14px;padding-top:14px;border-top:1px solid var(--line)}
+.fc small{color:var(--muted);font-weight:600;font-size:.78rem}
+.fc b{display:block;font-size:1.6rem;font-weight:700;letter-spacing:-.04em;line-height:1.1;margin:2px 0 4px}
+.fc p{margin:0;color:var(--muted);font-size:.84rem;font-weight:500}
+/* conclusão */
+.fim{background:var(--ink);color:var(--on-ink);border-radius:26px;padding:20px;display:flex;flex-direction:column;gap:12px}
+.fim h2 em{color:inherit;opacity:.55}
+.fim p{margin:0;opacity:.75;font-size:.9rem}
+.fim button{background:var(--on-ink);color:var(--ink)}
+/* configurações */
+.opt{display:flex;flex-direction:column;gap:8px;padding:14px 0;border-top:1px solid var(--line)}
+.opt:first-child{border-top:0;padding-top:0}
+.opt b{font-weight:700}
+/* PIN */
+.pin{font-size:1.8rem;letter-spacing:.6em;text-align:center;font-weight:700;padding:14px;background:var(--surface)}
+.linkbtn{background:none;padding:6px 0;color:var(--muted);align-self:flex-start;font-size:.85rem}
+/* comemoração */
+.cel{align-items:center;text-align:center}
+.cel .pct{font-size:5rem;font-weight:700;letter-spacing:-.06em;line-height:.9;margin:6px 0 0}
+.cel .pct+p{font-size:1.1rem;font-weight:600;margin:0}
+.cel small{color:var(--muted);font-weight:600}
+.cel .orb{position:relative;width:120px;height:120px;margin:4px auto 0}
+.cel .orb i{position:absolute;border-radius:50%;filter:blur(14px)}
+#confete{position:fixed;inset:0;width:100vw;height:100vh;pointer-events:none;z-index:40}
+.chip.flash{background:var(--orange);color:var(--card-ink)}
+.bigcode{font-size:1.5rem;font-weight:700;letter-spacing:.02em;text-align:center;background:var(--bg);border-radius:16px;padding:14px;font-variant-numeric:tabular-nums;user-select:all;-webkit-user-select:all}
+.row.four>button{flex:1 1 70px;padding-left:8px;padding-right:8px}
 [hidden]{display:none!important}
 </style>
 </head>
@@ -153,6 +192,20 @@ input,select{font:inherit;font-weight:500;padding:12px 14px;border-radius:14px;b
   <div class="row" id="whoBtns"></div>
 </section>
 
+<!-- PIN -->
+<section class="login" id="vPin" hidden>
+  <img class="logo" src="logo-mark.svg?v=4" alt="">
+  <h1 id="pinTitulo">Digite seu PIN</h1>
+  <p class="sub" id="pinSub"></p>
+  <label for="fPin">PIN
+    <input id="fPin" class="pin num" type="password" inputmode="numeric" pattern="[0-9]*" maxlength="4" autocomplete="off"></label>
+  <label for="fPin2" id="pin2Wrap" hidden>Repita o PIN
+    <input id="fPin2" class="pin num" type="password" inputmode="numeric" pattern="[0-9]*" maxlength="4" autocomplete="off"></label>
+  <button class="primary" id="btnPin">Continuar</button>
+  <p class="err" id="pinErr" hidden></p>
+  <button class="linkbtn" id="btnPinVoltar">Não sou eu, trocar pessoa</button>
+</section>
+
 <!-- App -->
 <div id="vApp" hidden>
   <div class="wrap">
@@ -175,6 +228,19 @@ input,select{font:inherit;font-weight:500;padding:12px 14px;border-radius:14px;b
       <span class="head">Juntado pelo casal</span>
       <div class="money num"><b id="sTotal">R$ 0</b><span>,00</span></div>
       <p class="meta num" id="sMeta"></p>
+    </section>
+
+    <section class="fim" id="pFim" hidden>
+      <h2>Ciclo completo<br><em>todos os números pagos</em></h2>
+      <p>Vocês podem começar um novo ciclo do zero. O que já foi pago fica guardado no histórico.</p>
+      <button id="btnCiclo">Começar novo ciclo</button>
+      <button id="btnCicloSim" hidden>Sim, começar do zero</button>
+    </section>
+
+    <section class="panel" aria-label="Meta da semana">
+      <div class="top"><h2>Meta da semana<br><em>2 números por pessoa</em></h2></div>
+      <div id="goals"></div>
+      <div class="fc"><small>Previsão de término</small><b id="fcData">—</b><p id="fcTexto"></p></div>
     </section>
 
     <section class="panel" aria-label="Atividade semanal">
@@ -202,6 +268,14 @@ input,select{font:inherit;font-weight:500;padding:12px 14px;border-radius:14px;b
       </div>
     </details>
 
+    <details id="cfg2">
+      <summary>Lembrete e segurança</summary>
+      <div class="form">
+        <div class="opt"><b>Lembrete semanal</b><p class="note" id="lemStatus"></p><button id="btnLembrete">Ativar lembrete</button></div>
+        <div class="opt"><b>Código do cofrinho</b><p class="note">Se o link vazou, gere um código novo. O outro celular vai precisar entrar com ele.</p><button id="btnCodigo">Trocar código</button></div>
+      </div>
+    </details>
+
     <section style="display:flex;flex-direction:column;gap:10px">
       <div class="top" style="align-items:center">
         <h2>Números<br><em>toque para escolher</em></h2>
@@ -220,8 +294,9 @@ input,select{font:inherit;font-weight:500;padding:12px 14px;border-radius:14px;b
   <div class="dock">
     <div class="dock-in">
       <div class="dock-sum"><span id="dList">Nenhum número escolhido</span><b class="num" id="dSum">R$ 0</b></div>
-      <div class="row">
+      <div class="row four">
         <button id="btnPar">+ Par</button>
+        <button id="btnSortear">Sortear</button>
         <button id="btnLimpar">Limpar</button>
         <button class="primary" id="btnPagar" disabled>Pagar</button>
       </div>
@@ -281,33 +356,76 @@ input,select{font:inherit;font-weight:500;padding:12px 14px;border-radius:14px;b
     <button class="primary" id="btnCloseAnd">Entendi</button>
   </div>
 </div>
+<div class="sheet" id="shCel" hidden>
+  <div class="sheet-in cel" role="dialog" aria-modal="true" aria-labelledby="celPct">
+    <div class="orb" aria-hidden="true"><i style="width:90px;height:90px;background:var(--red);left:0;top:10px"></i><i style="width:80px;height:80px;background:var(--orange);right:0;top:0"></i><i style="width:60px;height:60px;background:var(--lemon);left:30px;bottom:0"></i></div>
+    <p class="pct num" id="celPct">25%</p>
+    <p id="celTexto"></p>
+    <small class="num" id="celValor"></small>
+    <button class="primary" id="btnCelOk" style="align-self:stretch">Continuar</button>
+  </div>
+</div>
+<div class="sheet" id="shCod" hidden>
+  <div class="sheet-in" role="dialog" aria-modal="true" aria-labelledby="codTitulo">
+    <h2 id="codTitulo">Trocar código<br><em>do cofrinho</em></h2>
+    <div id="codPasso1" style="display:flex;flex-direction:column;gap:12px">
+      <p class="note">O código novo vai ser este. O antigo para de funcionar na hora.</p>
+      <div class="bigcode" id="novoCod"></div>
+      <button class="primary" id="btnCodSim">Trocar agora</button>
+      <button id="btnCodFechar">Cancelar</button>
+      <p class="err" id="codErr" hidden></p>
+    </div>
+    <div id="codPasso2" hidden style="display:flex;flex-direction:column;gap:12px">
+      <p class="note">Pronto. Mande este link para o outro celular. Ele vai entrar com o código novo.</p>
+      <div class="code" id="novoLink"></div>
+      <button class="primary" id="btnCodCopiar">Copiar link</button>
+      <button id="btnCodFechar2">Fechar</button>
+    </div>
+  </div>
+</div>
+<canvas id="confete" hidden></canvas>
 <div class="toast" id="toast" hidden></div>
 
 <script>
 const SUPA_URL='https://kaxtlbucpmbemdjwrsmo.supabase.co';
 const SUPA_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtheHRsYnVjcG1iZW1kandyc21vIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTM2MzM2NTQsImV4cCI6MjEwOTIwOTY1NH0.IQKF9_om_VzXOisFVaoAiIJEOPhGVmg0UgRlN99iUl0';
+const VAPID='BDBboLUO-9vjrVlClEXWfNQkQUi8uvpCnA1s_zNOKevDZ_UfbZXJpZF-1emjX0THx-mPYlyO67YW9TgSCWrY0WA';
+const META=2; // números por pessoa por semana
 const LS='cofrinhoCasal';
 
 const $=id=>document.getElementById(id);
-let loc={codigo:'',pessoa:'',key:'',name:'',city:''};
+let loc={codigo:'',pessoa:'',pin:'',key:'',name:'',city:''};
 try{Object.assign(loc,JSON.parse(localStorage.getItem(LS)||'{}'))}catch(e){}
 const saveLoc=()=>{try{localStorage.setItem(LS,JSON.stringify(loc))}catch(e){}};
 
-let info=null;          // {nome,maximo,pessoas}
+let info=null;          // {nome,maximo,ciclo,pessoas,com_pin}
 let pagos={};           // numero -> {pessoa,pago_em}
 let sel=new Set();
 let infoNum=null;
+let carregou=false;
 
 async function rpc(fn,args){
   const r=await fetch(SUPA_URL+'/rest/v1/rpc/'+fn,{method:'POST',headers:{'apikey':SUPA_KEY,'Authorization':'Bearer '+SUPA_KEY,'Content-Type':'application/json','Content-Profile':'cofrinho','Accept-Profile':'cofrinho'},body:JSON.stringify(args)});
   if(!r.ok)throw new Error((await r.text())||r.status);
   return r.json();
 }
+const auth=()=>({p_codigo:loc.codigo,p_pessoa:loc.pessoa,p_pin:loc.pin});
+function erroTexto(e){
+  return ({pin_incorreto:'PIN incorreto.',bloqueado:'Muitas tentativas erradas. Espere 15 minutos e tente de novo.',
+    sem_pin:'Crie seu PIN primeiro.',nao_e_seu:'Só quem marcou esse número pode desmarcar.',codigo:'O código do cofrinho mudou. Peça o novo código para quem trocou.',
+    formato:'Formato inválido.',incompleto:'Ainda faltam números neste ciclo.',ja_tem_pin:'Essa pessoa já tem PIN.'})[e]||'Algo deu errado. Tente de novo.';
+}
+// trata respostas {ok:false} que exigem voltar a uma tela
+function tratarErro(e){
+  if(e==='pin_incorreto'||e==='sem_pin'){loc.pin='';saveLoc();pedirPin();}
+  else if(e==='codigo'){loc.codigo='';loc.pin='';saveLoc();show('vLogin');$('loginErr').textContent=erroTexto(e);$('loginErr').hidden=false;}
+}
 
 const brl=v=>v.toLocaleString('pt-BR',{style:'currency',currency:'BRL',minimumFractionDigits:0,maximumFractionDigits:2});
 const dataBR=d=>d?d.split('-').reverse().join('/'):'';
-function toast(t){const e=$('toast');e.textContent=t;e.hidden=false;clearTimeout(toast.t);toast.t=setTimeout(()=>e.hidden=true,2400)}
-function show(v){['vLogin','vWho','vApp'].forEach(x=>$(x).hidden=x!==v)}
+const dataLonga=d=>d.toLocaleDateString('pt-BR',{day:'numeric',month:'long',year:'numeric'});
+function toast(t){const e=$('toast');e.textContent=t;e.hidden=false;clearTimeout(toast.t);toast.t=setTimeout(()=>e.hidden=true,2600)}
+function show(v){['vLogin','vWho','vPin','vApp'].forEach(x=>$(x).hidden=x!==v)}
 
 /* ---------- Pix (BR Code estático) ---------- */
 function clean(s,max){return (s||'').normalize('NFD').replace(/[̀-ͯ]/g,'').replace(/[^A-Za-z0-9 ]/g,'').toUpperCase().trim().slice(0,max)}
@@ -328,36 +446,77 @@ async function entrar(codigo){
   try{
     const r=await rpc('info',{p_codigo:codigo});
     if(!r.length){$('loginErr').textContent='Código não encontrado. Confira as letras e os traços.';$('loginErr').hidden=false;show('vLogin');return;}
-    info=r[0];loc.codigo=codigo.trim().toLowerCase();saveLoc();
-    if(!loc.pessoa||!info.pessoas.includes(loc.pessoa))escolherPessoa();else iniciar();
+    info=r[0];
+    const novo=codigo.trim().toLowerCase();
+    if(novo!==loc.codigo){loc.codigo=novo;loc.pin='';}
+    saveLoc();
+    if(!loc.pessoa||!info.pessoas.includes(loc.pessoa)){escolherPessoa();return;}
+    if(!loc.pin){pedirPin();return;}
+    const v=await rpc('entrar',auth());
+    if(v.ok)iniciar();else{ if(v.erro==='bloqueado'){pedirPin();mostrarPinErro(erroTexto(v.erro));} else tratarErro(v.erro); }
   }catch(e){$('loginErr').textContent='Sem conexão com o servidor. Verifique a internet e tente de novo.';$('loginErr').hidden=false;show('vLogin');}
 }
 function escolherPessoa(){
   const b=$('whoBtns');b.innerHTML='';
-  info.pessoas.forEach(p=>{const x=document.createElement('button');x.className='primary';x.textContent=p;x.onclick=()=>{loc.pessoa=p;saveLoc();iniciar();};b.appendChild(x);});
+  info.pessoas.forEach(p=>{const x=document.createElement('button');x.className='primary';x.textContent=p;x.onclick=()=>{loc.pessoa=p;loc.pin='';saveLoc();pedirPin();};b.appendChild(x);});
   show('vWho');
 }
+
+/* ---------- PIN ---------- */
+let criandoPin=false;
+function mostrarPinErro(t){$('pinErr').textContent=t;$('pinErr').hidden=!t;}
+function pedirPin(){
+  criandoPin=!(info.com_pin||[]).includes(loc.pessoa);
+  $('pinTitulo').innerHTML=criandoPin?'Crie seu PIN<br><em>'+loc.pessoa+'</em>':'Olá, '+loc.pessoa+'<br><em>digite seu PIN</em>';
+  $('pinSub').textContent=criandoPin?'São 4 números. Ele protege os seus pagamentos e só você usa.':'O PIN que você criou na primeira vez.';
+  $('pin2Wrap').hidden=!criandoPin;
+  $('fPin').value='';$('fPin2').value='';mostrarPinErro('');
+  show('vPin');setTimeout(()=>$('fPin').focus(),50);
+}
+async function enviarPin(){
+  const p=$('fPin').value.trim(),p2=$('fPin2').value.trim();
+  if(!/^\d{4}$/.test(p)){mostrarPinErro('O PIN tem 4 números.');return;}
+  if(criandoPin&&p!==p2){mostrarPinErro('Os dois PINs não são iguais.');return;}
+  $('btnPin').disabled=true;
+  try{
+    if(criandoPin){
+      const r=await rpc('definir_pin',{p_codigo:loc.codigo,p_pessoa:loc.pessoa,p_pin:p});
+      if(!r.ok&&r.erro!=='ja_tem_pin'){mostrarPinErro(erroTexto(r.erro));return;}
+      if(!r.ok){const i=await rpc('info',{p_codigo:loc.codigo});info=i[0];pedirPin();mostrarPinErro('Essa pessoa já tem PIN. Digite o PIN dela.');return;}
+      info.com_pin=[...(info.com_pin||[]),loc.pessoa];
+    }else{
+      const r=await rpc('entrar',{p_codigo:loc.codigo,p_pessoa:loc.pessoa,p_pin:p});
+      if(!r.ok){mostrarPinErro(erroTexto(r.erro));return;}
+    }
+    loc.pin=p;saveLoc();iniciar();
+  }catch(e){mostrarPinErro('Sem conexão. Tente de novo.');}
+  finally{$('btnPin').disabled=false;}
+}
+
 function iniciar(){
   show('vApp');
-  
   $('tWho').textContent=loc.pessoa;
   const [p1,p2]=info.pessoas;
   $('lP1').textContent=p1||'';$('lP2').textContent=p2||'';$('gP1').textContent='Pago por '+(p1||'');$('gP2').textContent='Pago por '+(p2||'');
   $('fKey').value=loc.key;$('fName').value=loc.name;$('fCity').value=loc.city;
   if(!loc.key)$('cfg').open=true;
-  montarGrade();carregar();
+  montarGrade();carregar();statusLembrete();
 }
 
 /* ---------- Dados ---------- */
 async function carregar(){
-  if(!loc.codigo)return;
+  if(!loc.codigo||!info)return;
   $('sync').textContent='Atualizando…';
   try{
-    const r=await rpc('listar',{p_codigo:loc.codigo});
+    const [r,i]=await Promise.all([rpc('listar',{p_codigo:loc.codigo}),rpc('info',{p_codigo:loc.codigo})]);
+    if(!i.length){tratarErro('codigo');return;}
+    const cicloMudou=info.ciclo!==i[0].ciclo;info=i[0];
     pagos={};r.forEach(x=>pagos[x.numero]={pessoa:x.pessoa,pago_em:x.pago_em});
     for(const n of [...sel])if(pagos[n])sel.delete(n);
     $('sync').textContent='Atualizado às '+new Date().toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'});
     render();
+    if(carregou)verificarMarcos();else{carregou=true;registrarMarcosAtuais();}
+    if(cicloMudou)toast('Começou o ciclo '+info.ciclo);
   }catch(e){$('sync').textContent='Sem conexão, tentando de novo';}
 }
 
@@ -370,18 +529,22 @@ function montarGrade(){
     c.onclick=()=>tocar(i);g.appendChild(c);
   }
 }
-function render(){
-  const [p1,p2]=info.pessoas;
-  let t=0,t1=0,t2=0,n=0;
+function somas(){
+  const [p1,p2]=info.pessoas;let t=0,t1=0,t2=0,n=0;
   for(const k in pagos){const v=+k;t+=v;n++;if(pagos[k].pessoa===p1)t1+=v;else if(pagos[k].pessoa===p2)t2+=v;}
-  const T=total();
+  return {t,t1,t2,n};
+}
+function render(){
+  const [p1]=info.pessoas;
+  const {t,t1,t2,n}=somas(),T=total();
   $('sTotal').textContent=brl(t);
   $('sMeta').textContent='de '+brl(T)+'  ·  '+Math.floor(t/T*100)+'% da meta';
   $('sP1').textContent=brl(t1);$('sP2').textContent=brl(t2);
   const livres=info.maximo-n;
   $('sFalta').textContent=brl(T-t);$('sLivres').textContent=livres+(livres===1?' número livre':' números livres');
-  $('tSub').textContent='Números de 1 a '+info.maximo;
-  desenharAtividade();
+  $('tSub').textContent='Números de 1 a '+info.maximo+(info.ciclo>1?'  ·  ciclo '+info.ciclo:'');
+  $('pFim').hidden=livres>0;
+  desenharAtividade();desenharMeta();
   document.querySelectorAll('.chip').forEach(c=>{
     const k=+c.dataset.n,p=pagos[k];
     c.className='chip'+(p?(p.pessoa===p1?' p1':' p2'):'')+(sel.has(k)?' sel':'');
@@ -391,19 +554,66 @@ function render(){
   $('dSum').textContent=brl(soma);
   $('dList').textContent=arr.length?arr.length+(arr.length===1?' número: ':' números: ')+arr.join(', '):'Nenhum número escolhido';
   $('btnPagar').disabled=!arr.length;$('btnLimpar').disabled=!arr.length;
-  $('btnPar').disabled=!proximoPar();
+  $('btnPar').disabled=!proximoPar();$('btnSortear').disabled=!livresLista().length;
 }
 
+/* ---------- Semanas, meta e previsão ---------- */
 function inicioSemana(d){const x=new Date(d.getFullYear(),d.getMonth(),d.getDate());const w=(x.getDay()+6)%7;x.setDate(x.getDate()-w);return x;}
+const parseData=s=>{const [y,m,d]=s.split('-').map(Number);return new Date(y,m-1,d);};
+function porSemana(pessoa){ // mapa inícioSemana(ms) -> quantidade de números
+  const m=new Map();
+  for(const k in pagos){const p=pagos[k];if(pessoa&&p.pessoa!==pessoa)continue;if(!p.pago_em)continue;
+    const s=inicioSemana(parseData(p.pago_em)).getTime();m.set(s,(m.get(s)||0)+1);}
+  return m;
+}
+function feitosSemana(pessoa){return porSemana(pessoa).get(inicioSemana(new Date()).getTime())||0;}
+function sequencia(pessoa){
+  const m=porSemana(pessoa);let s=inicioSemana(new Date()),c=0;
+  if((m.get(s.getTime())||0)>=META)c=1;
+  s=new Date(s);s.setDate(s.getDate()-7);
+  while((m.get(s.getTime())||0)>=META){c++;s.setDate(s.getDate()-7);}
+  return c;
+}
 function desenharAtividade(){
   const hoje=inicioSemana(new Date()),sem=[];
   for(let i=7;i>=0;i--){const d=new Date(hoje);d.setDate(d.getDate()-7*i);sem.push({d,v:0});}
-  for(const k in pagos){const pe=pagos[k].pago_em;if(!pe)continue;const [y,m,dd]=pe.split('-').map(Number);const s=inicioSemana(new Date(y,m-1,dd)).getTime();
+  for(const k in pagos){const pe=pagos[k].pago_em;if(!pe)continue;const s=inicioSemana(parseData(pe)).getTime();
     const it=sem.find(x=>x.d.getTime()===s);if(it)it.v+=+k;}
   const max=Math.max(1,...sem.map(x=>x.v));
   $('chart').innerHTML=sem.map(x=>'<div class="col" title="'+brl(x.v)+'"><div class="track"><div class="barv'+(x.v?'':' zero')+'" style="height:'+(x.v?Math.max(4,x.v/max*100):100)+'%"></div></div><small>'+String(x.d.getDate()).padStart(2,'0')+'/'+String(x.d.getMonth()+1).padStart(2,'0')+'</small></div>').join('');
   $('sSemana').textContent=brl(sem[7].v)+' esta semana';
 }
+function desenharMeta(){
+  const [p1,p2]=info.pessoas,cls={[p1]:'k1',[p2]:'k2'};
+  const livres=info.maximo-Object.keys(pagos).length;
+  $('goals').innerHTML=info.pessoas.map(p=>{
+    const f=feitosSemana(p),s=sequencia(p),ok=f>=META;
+    const dots=Array.from({length:META},(_,i)=>'<i class="dot '+(i<f?'on '+cls[p]:'')+'"></i>').join('');
+    return '<div class="goal"><div class="gl"><b>'+p+(p===loc.pessoa?' <em>você</em>':'')+'</b><small>'+(ok?'Meta da semana feita':'Faltam '+(META-f)+(META-f===1?' número':' números'))+(s?'  ·  '+s+(s===1?' semana seguida':' semanas seguidas'):'')+'</small></div><div class="dots">'+dots+'</div></div>';
+  }).join('');
+  // previsão
+  const hoje=new Date(),ini=inicioSemana(hoje),fimSemana=new Date(ini);fimSemana.setDate(ini.getDate()+6);
+  const porPessoaSemana=info.pessoas.reduce((a,p)=>a+Math.max(0,META-feitosSemana(p)),0);
+  const ritmoMeta=META*info.pessoas.length;
+  let fimMeta;
+  if(livres<=0)fimMeta=null;
+  else if(livres<=porPessoaSemana)fimMeta=fimSemana;
+  else{fimMeta=new Date(fimSemana);fimMeta.setDate(fimMeta.getDate()+7*Math.ceil((livres-porPessoaSemana)/ritmoMeta));}
+  const datas=Object.values(pagos).map(p=>p.pago_em).filter(Boolean).sort();
+  let real='';
+  if(livres>0&&datas.length){
+    const primeira=inicioSemana(parseData(datas[0]));
+    const semanas=Math.max(1,Math.round((ini-primeira)/6048e5)+1);
+    const ritmo=Object.keys(pagos).length/semanas;
+    if(semanas>=2&&ritmo>0){const d=new Date(fimSemana);d.setDate(d.getDate()+7*Math.max(0,Math.ceil(livres/ritmo)-1));
+      real='No ritmo de vocês até agora ('+ritmo.toLocaleString('pt-BR',{maximumFractionDigits:1})+' números por semana), o fim seria em '+dataLonga(d)+'.';}
+    else real='Com mais uma semana de pagamentos dá para comparar com o ritmo real de vocês.';
+  }
+  $('fcData').textContent=fimMeta?dataLonga(fimMeta):'Concluído';
+  $('fcTexto').textContent=fimMeta?('Se cada um pagar '+META+' números por semana. '+real):'Vocês pagaram todos os números deste ciclo.';
+}
+
+/* ---------- Seleção ---------- */
 function tocar(i){
   if(pagos[i]){abrirInfo(i);return;}
   sel.has(i)?sel.delete(i):sel.add(i);render();
@@ -413,6 +623,24 @@ function proximoPar(){
   for(let a=1;a<=Math.ceil(m/2);a++){const b=m+1-a;if(!pagos[a]&&!pagos[b]&&!sel.has(a)&&!sel.has(b))return a===b?[a]:[a,b];}
   for(let a=1;a<=m;a++)if(!pagos[a]&&!sel.has(a))return [a];
   return null;
+}
+const livresLista=()=>{const l=[];for(let i=1;i<=info.maximo;i++)if(!pagos[i]&&!sel.has(i))l.push(i);return l;};
+function sortear(){
+  const l=livresLista();if(!l.length)return;
+  const pend=META-feitosSemana(loc.pessoa),quantos=Math.min(l.length,pend>0?pend:META);
+  const escolhidos=[];const pool=[...l];
+  for(let i=0;i<quantos;i++){const j=crypto.getRandomValues(new Uint32Array(1))[0]%pool.length;escolhidos.push(pool.splice(j,1)[0]);}
+  const reduz=matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if(reduz){escolhidos.forEach(n=>sel.add(n));render();return;}
+  let passo=0;$('btnSortear').disabled=true;
+  const tick=setInterval(()=>{
+    document.querySelectorAll('.chip.flash').forEach(c=>c.classList.remove('flash'));
+    for(let i=0;i<quantos;i++){const n=l[crypto.getRandomValues(new Uint32Array(1))[0]%l.length];document.querySelector('.chip[data-n="'+n+'"]')?.classList.add('flash');}
+    if(++passo>=10){clearInterval(tick);document.querySelectorAll('.chip.flash').forEach(c=>c.classList.remove('flash'));
+      escolhidos.forEach(n=>sel.add(n));render();
+      document.querySelector('.chip[data-n="'+escolhidos[0]+'"]')?.scrollIntoView({block:'center',behavior:'smooth'});
+      toast('Sorteados: '+escolhidos.sort((a,b)=>a-b).join(' e '));}
+  },90);
 }
 
 /* ---------- Pagamento ---------- */
@@ -434,31 +662,131 @@ function abrirPagar(){
 async function confirmar(){
   const arr=[...sel];$('btnConfirm').disabled=true;
   try{
-    await rpc('pagar',{p_codigo:loc.codigo,p_numeros:arr,p_pessoa:loc.pessoa});
+    const r=await rpc('pagar',{...auth(),p_numeros:arr});
+    if(!r.ok){$('shPay').hidden=true;toast(erroTexto(r.erro));tratarErro(r.erro);return;}
     sel.clear();$('shPay').hidden=true;toast('Pagamento registrado para '+loc.pessoa);await carregar();
   }catch(e){$('payErr').textContent='Não consegui salvar. Verifique a internet e toque de novo.';$('payErr').hidden=false;}
-  $('btnConfirm').disabled=false;
+  finally{$('btnConfirm').disabled=false;}
 }
 
 /* ---------- Número já pago ---------- */
 function abrirInfo(i){
-  infoNum=i;const p=pagos[i];
+  infoNum=i;const p=pagos[i],meu=p.pessoa===loc.pessoa;
   $('infoTitle').textContent='Número '+i;
-  $('infoText').textContent='Pago por '+p.pessoa+' em '+dataBR(p.pago_em)+'.';
-  $('btnUnmark').hidden=false;$('btnUnmarkYes').hidden=true;$('btnUnmark').textContent='Desmarcar este número';
+  $('infoText').textContent='Pago por '+p.pessoa+' em '+dataBR(p.pago_em)+'.'+(meu?'':' Só '+p.pessoa+' pode desmarcar.');
+  $('btnUnmark').hidden=!meu;$('btnUnmarkYes').hidden=true;
   $('shInfo').hidden=false;
 }
 async function desmarcar(){
-  try{await rpc('desmarcar',{p_codigo:loc.codigo,p_numeros:[infoNum]});$('shInfo').hidden=true;toast('Número '+infoNum+' desmarcado');await carregar();}
+  try{const r=await rpc('desmarcar',{...auth(),p_numeros:[infoNum]});
+    $('shInfo').hidden=true;
+    if(!r.ok){toast(erroTexto(r.erro));tratarErro(r.erro);return;}
+    toast('Número '+infoNum+' desmarcado');await carregar();}
   catch(e){toast('Não consegui desmarcar. Tente de novo.');}
+}
+
+/* ---------- Comemoração a cada 25% ---------- */
+const chaveMarcos=()=>'cofrinhoMarcos-'+loc.codigo.slice(0,4)+'-c'+info.ciclo;
+function marcosVistos(){try{return JSON.parse(localStorage.getItem(chaveMarcos())||'[]')}catch(e){return []}}
+function salvarMarcos(m){try{localStorage.setItem(chaveMarcos(),JSON.stringify(m))}catch(e){}}
+const pctAtual=()=>somas().t/total()*100;
+function registrarMarcosAtuais(){const p=pctAtual(),v=marcosVistos();[25,50,75,100].forEach(m=>{if(p>=m&&!v.includes(m))v.push(m);});salvarMarcos(v);}
+function verificarMarcos(){
+  const p=pctAtual(),v=marcosVistos();
+  const novo=[25,50,75,100].filter(m=>p>=m&&!v.includes(m)).pop();
+  if(!novo)return;
+  [25,50,75,100].forEach(m=>{if(p>=m&&!v.includes(m))v.push(m);});salvarMarcos(v);
+  comemorar(novo);
+}
+function comemorar(m){
+  const frases={25:'Um quarto do caminho. Continuem assim.',50:'Metade do cofrinho cheio.',75:'Faltam só 25%. Está quase.',100:'Cofrinho completo. Vocês conseguiram.'};
+  $('celPct').textContent=m+'%';$('celTexto').textContent=frases[m];
+  $('celValor').textContent=brl(somas().t)+' juntos';
+  $('toast').hidden=true;$('shCel').hidden=false;confete();
+}
+function confete(){
+  if(matchMedia('(prefers-reduced-motion: reduce)').matches)return;
+  const cv=$('confete'),ctx=cv.getContext('2d'),dpr=devicePixelRatio||1;
+  cv.width=innerWidth*dpr;cv.height=innerHeight*dpr;ctx.scale(dpr,dpr);
+  const cores=['#e2231a','#f7a21b','#e9e77d','#a9c4b1','#b08a52','#0d0d0d'];
+  const ps=Array.from({length:120},()=>({x:innerWidth/2,y:innerHeight*0.45,vx:(Math.random()-0.5)*12,vy:-Math.random()*13-4,r:Math.random()*6+4,c:cores[Math.random()*cores.length|0],a:Math.random()*6,va:(Math.random()-0.5)*0.3,circ:Math.random()<0.5}));
+  let fr=0;cv.hidden=false;
+  (function loop(){ctx.clearRect(0,0,innerWidth,innerHeight);
+    ps.forEach(p=>{p.vy+=0.35;p.vx*=0.99;p.x+=p.vx;p.y+=p.vy;p.a+=p.va;ctx.save();ctx.translate(p.x,p.y);ctx.rotate(p.a);ctx.fillStyle=p.c;
+      if(p.circ){ctx.beginPath();ctx.arc(0,0,p.r/2,0,7);ctx.fill();}else ctx.fillRect(-p.r/2,-p.r/4,p.r,p.r/2);ctx.restore();});
+    if(++fr<150)requestAnimationFrame(loop);else{ctx.clearRect(0,0,innerWidth,innerHeight);cv.hidden=true;}})();
+}
+
+/* ---------- Novo ciclo ---------- */
+async function novoCiclo(){
+  $('btnCicloSim').disabled=true;
+  try{const r=await rpc('novo_ciclo',auth());
+    if(!r.ok){toast(erroTexto(r.erro));tratarErro(r.erro);return;}
+    $('btnCiclo').hidden=false;$('btnCicloSim').hidden=true;carregou=false;sel.clear();await carregar();toast('Ciclo '+r.ciclo+' começou. Boa sorte!');}
+  catch(e){toast('Não consegui começar o novo ciclo.');}
+  finally{$('btnCicloSim').disabled=false;}
+}
+
+/* ---------- Trocar código ---------- */
+function gerarCodigo(){const a='abcdefghjkmnpqrstuvwxyz23456789',r=crypto.getRandomValues(new Uint32Array(12));let s='';r.forEach((v,i)=>{s+=a[v%a.length];if(i===3||i===7)s+='-';});return s;}
+let codigoNovo='';
+function abrirTrocaCodigo(){codigoNovo=gerarCodigo();$('novoCod').textContent=codigoNovo;$('codPasso1').hidden=false;$('codPasso2').hidden=true;$('codErr').hidden=true;$('shCod').hidden=false;}
+async function confirmarTrocaCodigo(){
+  $('btnCodSim').disabled=true;
+  try{const r=await rpc('trocar_codigo',{...auth(),p_novo:codigoNovo});
+    if(!r.ok){$('codErr').textContent=erroTexto(r.erro);$('codErr').hidden=false;return;}
+    loc.codigo=codigoNovo;saveLoc();
+    $('novoLink').textContent=location.origin+location.pathname+'#'+codigoNovo;
+    $('codPasso1').hidden=true;$('codPasso2').hidden=false;}
+  catch(e){$('codErr').textContent='Sem conexão. Tente de novo.';$('codErr').hidden=false;}
+  finally{$('btnCodSim').disabled=false;}
+}
+
+/* ---------- Lembrete semanal (notificação) ---------- */
+function b64(s){const p='='.repeat((4-s.length%4)%4),b=atob((s+p).replace(/-/g,'+').replace(/_/g,'/'));return Uint8Array.from(b,c=>c.charCodeAt(0));}
+const pushOk=()=>'serviceWorker' in navigator&&'PushManager' in window&&'Notification' in window;
+async function statusLembrete(){
+  const btn=$('btnLembrete'),st=$('lemStatus');
+  if(!pushOk()){btn.disabled=true;st.textContent=isIos&&!standalone?'No iPhone, instale o Cofrinho na Tela de Início primeiro. Depois abra pelo ícone e ative aqui.':'Este navegador não aceita notificações.';return;}
+  try{const reg=await navigator.serviceWorker.getRegistration();
+    if(!reg){btn.disabled=true;st.textContent='Feche e abra o app de novo para ativar o lembrete.';return;}
+    const sub=await reg.pushManager.getSubscription();
+    btn.disabled=false;
+    if(sub&&Notification.permission==='granted'){btn.textContent='Desativar lembrete';btn.dataset.on='1';st.textContent='Ativo neste celular. Aviso no sábado às 9h e no domingo às 17h se faltar algum número seu da semana.';}
+    else{btn.textContent='Ativar lembrete';btn.dataset.on='';st.textContent=Notification.permission==='denied'?'As notificações estão bloqueadas para este site. Libere nas configurações do celular.':'Receba um aviso no sábado e no domingo se faltar algum número seu da semana.';}
+  }catch(e){st.textContent='Não consegui verificar o lembrete.';}
+}
+async function alternarLembrete(){
+  const btn=$('btnLembrete');btn.disabled=true;
+  try{
+    const reg=await navigator.serviceWorker.ready;
+    if(btn.dataset.on){const sub=await reg.pushManager.getSubscription();if(sub){await rpc('desinscrever',{p_endpoint:sub.endpoint}).catch(()=>{});await sub.unsubscribe();}toast('Lembrete desativado');}
+    else{
+      const perm=await Notification.requestPermission();
+      if(perm!=='granted'){toast('Sem permissão para notificar');return;}
+      const sub=await reg.pushManager.getSubscription()||await reg.pushManager.subscribe({userVisibleOnly:true,applicationServerKey:b64(VAPID)});
+      const j=sub.toJSON();
+      const r=await rpc('inscrever',{...auth(),p_endpoint:j.endpoint,p_p256dh:j.keys.p256dh,p_auth:j.keys.auth});
+      if(!r.ok){toast(erroTexto(r.erro));tratarErro(r.erro);return;}
+      await fetch(SUPA_URL+'/functions/v1/cofrinho-lembrete',{method:'POST',headers:{'Authorization':'Bearer '+SUPA_KEY,'apikey':SUPA_KEY,'Content-Type':'application/json'},body:JSON.stringify({teste:true,endpoint:j.endpoint})}).catch(()=>{});
+      toast('Lembrete ativado. Mandei um aviso de teste.');
+    }
+  }catch(e){toast('Não consegui mudar o lembrete.');}
+  finally{await statusLembrete();}
 }
 
 /* ---------- Eventos ---------- */
 $('btnEntrar').onclick=()=>{const c=$('fCodigo').value.trim();if(c)entrar(c);};
 $('fCodigo').addEventListener('keydown',e=>{if(e.key==='Enter')$('btnEntrar').click();});
-$('btnTroca').onclick=escolherPessoa;
+$('btnPin').onclick=enviarPin;
+['fPin','fPin2'].forEach(id=>$(id).addEventListener('keydown',e=>{if(e.key==='Enter')enviarPin();}));
+$('fPin').addEventListener('input',()=>{if(!criandoPin&&$('fPin').value.length===4)enviarPin();else if(criandoPin&&$('fPin').value.length===4)$('fPin2').focus();});
+$('fPin2').addEventListener('input',()=>{if($('fPin2').value.length===4)enviarPin();});
+$('btnPinVoltar').onclick=escolherPessoa;
+$('btnTroca').onclick=()=>{loc.pin='';saveLoc();escolherPessoa();};
 $('btnSave').onclick=()=>{loc.key=normKey($('fKey').value);loc.name=$('fName').value;loc.city=$('fCity').value;saveLoc();$('cfg').open=false;toast(loc.key?'Dados do Pix salvos':'Chave removida');};
 $('btnPar').onclick=()=>{const p=proximoPar();if(p){p.forEach(n=>sel.add(n));render();}};
+$('btnSortear').onclick=sortear;
 $('btnLimpar').onclick=()=>{sel.clear();render();};
 $('btnPagar').onclick=abrirPagar;
 $('btnClosePay').onclick=()=>$('shPay').hidden=true;
@@ -470,10 +798,17 @@ $('btnCopy').onclick=()=>{
 $('btnUnmark').onclick=()=>{$('btnUnmark').hidden=true;$('btnUnmarkYes').hidden=false;};
 $('btnUnmarkYes').onclick=desmarcar;
 $('btnCloseInfo').onclick=()=>$('shInfo').hidden=true;
-['shPay','shInfo'].forEach(id=>$(id).addEventListener('click',e=>{if(e.target.id===id)$(id).hidden=true;}));
-document.addEventListener('visibilitychange',()=>{if(!document.hidden)carregar();});
-setInterval(()=>{if(!document.hidden&&info)carregar();},20000);
-
+$('btnCelOk').onclick=()=>$('shCel').hidden=true;
+$('btnCiclo').onclick=()=>{$('btnCiclo').hidden=true;$('btnCicloSim').hidden=false;};
+$('btnCicloSim').onclick=novoCiclo;
+$('btnLembrete').onclick=alternarLembrete;
+$('btnCodigo').onclick=abrirTrocaCodigo;
+$('btnCodSim').onclick=confirmarTrocaCodigo;
+$('btnCodFechar').onclick=()=>$('shCod').hidden=true;$('btnCodFechar2').onclick=()=>$('shCod').hidden=true;
+$('btnCodCopiar').onclick=()=>{const t=$('novoLink').textContent;if(navigator.clipboard)navigator.clipboard.writeText(t).then(()=>toast('Link copiado'),()=>toast('Selecione e copie o link'));};
+['shPay','shInfo','shCel','shCod'].forEach(id=>$(id).addEventListener('click',e=>{if(e.target.id===id)$(id).hidden=true;}));
+document.addEventListener('visibilitychange',()=>{if(!document.hidden&&!$('vApp').hidden)carregar();});
+setInterval(()=>{if(!document.hidden&&info&&!$('vApp').hidden)carregar();},20000);
 
 /* ---------- Instalação ---------- */
 const standalone=matchMedia('(display-mode: standalone)').matches||navigator.standalone===true;
@@ -490,7 +825,7 @@ async function instalar(){
 $('btnInstall').onclick=instalar;$('btnInstall2').onclick=instalar;
 $('btnCloseIos').onclick=()=>$('shIos').hidden=true;$('btnCloseAnd').onclick=()=>$('shAndroid').hidden=true;
 ['shIos','shAndroid'].forEach(id=>$(id).addEventListener('click',e=>{if(e.target.id===id)$(id).hidden=true;}));
-if('serviceWorker' in navigator)addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(()=>{}));
+if('serviceWorker' in navigator)navigator.serviceWorker.register('sw.js').catch(()=>{});
 
 /* ---------- Início ---------- */
 const hash=decodeURIComponent(location.hash.slice(1));
