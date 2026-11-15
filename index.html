@@ -269,9 +269,9 @@ input,select{font:inherit;font-weight:500;padding:12px 14px;border-radius:14px;b
     </details>
 
     <details id="cfg2">
-      <summary>Lembrete e segurança</summary>
+      <summary>Avisos e segurança</summary>
       <div class="form">
-        <div class="opt"><b>Lembrete semanal</b><p class="note" id="lemStatus"></p><button id="btnLembrete">Ativar lembrete</button></div>
+        <div class="opt"><b>Avisos no celular</b><p class="note" id="lemStatus"></p><button id="btnLembrete">Ativar avisos</button></div>
         <div class="opt"><b>Código do cofrinho</b><p class="note">Se o link vazou, gere um código novo. O outro celular vai precisar entrar com ele.</p><button id="btnCodigo">Trocar código</button></div>
       </div>
     </details>
@@ -749,18 +749,18 @@ async function statusLembrete(){
   const btn=$('btnLembrete'),st=$('lemStatus');
   if(!pushOk()){btn.disabled=true;st.textContent=isIos&&!standalone?'No iPhone, instale o Cofrinho na Tela de Início primeiro. Depois abra pelo ícone e ative aqui.':'Este navegador não aceita notificações.';return;}
   try{const reg=await navigator.serviceWorker.getRegistration();
-    if(!reg){btn.disabled=true;st.textContent='Feche e abra o app de novo para ativar o lembrete.';return;}
+    if(!reg){btn.disabled=true;st.textContent='Feche e abra o app de novo para ativar os avisos.';return;}
     const sub=await reg.pushManager.getSubscription();
     btn.disabled=false;
-    if(sub&&Notification.permission==='granted'){btn.textContent='Desativar lembrete';btn.dataset.on='1';st.textContent='Ativo neste celular. Aviso no sábado às 9h e no domingo às 17h se faltar algum número seu da semana.';}
-    else{btn.textContent='Ativar lembrete';btn.dataset.on='';st.textContent=Notification.permission==='denied'?'As notificações estão bloqueadas para este site. Libere nas configurações do celular.':'Receba um aviso no sábado e no domingo se faltar algum número seu da semana.';}
+    if(sub&&Notification.permission==='granted'){btn.textContent='Desativar avisos';btn.dataset.on='1';st.textContent='Ativo neste celular. Você recebe um aviso quando o outro pagar e um lembrete no sábado às 9h e no domingo às 17h se faltar algum número seu.';}
+    else{btn.textContent='Ativar avisos';btn.dataset.on='';st.textContent=Notification.permission==='denied'?'As notificações estão bloqueadas para este site. Libere nas configurações do celular.':'Saiba na hora quando o outro pagar e receba um lembrete no fim de semana se faltar algum número seu.';}
   }catch(e){st.textContent='Não consegui verificar o lembrete.';}
 }
 async function alternarLembrete(){
   const btn=$('btnLembrete');btn.disabled=true;
   try{
     const reg=await navigator.serviceWorker.ready;
-    if(btn.dataset.on){const sub=await reg.pushManager.getSubscription();if(sub){await rpc('desinscrever',{p_endpoint:sub.endpoint}).catch(()=>{});await sub.unsubscribe();}toast('Lembrete desativado');}
+    if(btn.dataset.on){const sub=await reg.pushManager.getSubscription();if(sub){await rpc('desinscrever',{p_endpoint:sub.endpoint}).catch(()=>{});await sub.unsubscribe();}toast('Avisos desativados');}
     else{
       const perm=await Notification.requestPermission();
       if(perm!=='granted'){toast('Sem permissão para notificar');return;}
@@ -769,9 +769,9 @@ async function alternarLembrete(){
       const r=await rpc('inscrever',{...auth(),p_endpoint:j.endpoint,p_p256dh:j.keys.p256dh,p_auth:j.keys.auth});
       if(!r.ok){toast(erroTexto(r.erro));tratarErro(r.erro);return;}
       await fetch(SUPA_URL+'/functions/v1/cofrinho-lembrete',{method:'POST',headers:{'Authorization':'Bearer '+SUPA_KEY,'apikey':SUPA_KEY,'Content-Type':'application/json'},body:JSON.stringify({teste:true,endpoint:j.endpoint})}).catch(()=>{});
-      toast('Lembrete ativado. Mandei um aviso de teste.');
+      toast('Avisos ativados. Mandei um de teste.');
     }
-  }catch(e){toast('Não consegui mudar o lembrete.');}
+  }catch(e){toast('Não consegui mudar os avisos.');}
   finally{await statusLembrete();}
 }
 

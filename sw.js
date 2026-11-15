@@ -1,4 +1,4 @@
-const CACHE='cofrinho-v7';
+const CACHE='cofrinho-v8';
 const SHELL=['./','./index.html','./manifest.webmanifest','./icon-192.png','./icon-512.png','./apple-touch-icon.png','./logo-mark.svg'];
 self.addEventListener('install',e=>{e.waitUntil(caches.open(CACHE).then(c=>c.addAll(SHELL)));self.skipWaiting();});
 self.addEventListener('activate',e=>{e.waitUntil(caches.keys().then(ks=>Promise.all(ks.filter(k=>k!==CACHE).map(k=>caches.delete(k)))));self.clients.claim();});
@@ -13,7 +13,7 @@ self.addEventListener('push',e=>{
   let d={};try{d=e.data?e.data.json():{};}catch(_){d={body:e.data&&e.data.text()};}
   e.waitUntil(self.registration.showNotification(d.title||'Cofrinho do Casal',{
     body:d.body||'Tem número esperando por você esta semana.',
-    icon:'icon-192.png?v=4',badge:'icon-192.png?v=4',tag:'cofrinho-semana',renotify:true,
+    icon:'icon-192.png?v=4',badge:'icon-192.png?v=4',tag:d.tag||'cofrinho',renotify:true,
     data:{url:d.url||'./'}
   }));
 });
