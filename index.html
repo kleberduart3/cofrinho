@@ -383,6 +383,17 @@ input,select{font:inherit;font-weight:500;padding:12px 14px;border-radius:14px;b
     </div>
   </div>
 </div>
+<div class="sheet" id="shPerm" hidden>
+  <div class="sheet-in" role="dialog" aria-modal="true" aria-labelledby="permTitulo">
+    <h2 id="permTitulo">Notificações bloqueadas<br><em>libere uma vez</em></h2>
+    <p class="note">O celular bloqueou os avisos do Cofrinho. Libere assim e toque em Ativar avisos de novo:</p>
+    <ol class="steps">
+      <li><b>iPhone:</b> Ajustes → Notificações → Cofrinho → ative <b>Permitir Notificações</b>. O Cofrinho precisa estar instalado na Tela de Início e aberto pelo ícone.</li>
+      <li><b>Android:</b> toque e segure o ícone do Cofrinho → Informações do app → Notificações → ative. Se estiver usando pelo Chrome, toque no cadeado ao lado do endereço → Permissões → Notificações → Permitir.</li>
+    </ol>
+    <button class="primary" id="btnPermOk">Entendi</button>
+  </div>
+</div>
 <canvas id="confete" hidden></canvas>
 <div class="toast" id="toast" hidden></div>
 
@@ -753,17 +764,20 @@ async function statusLembrete(){
     const sub=await reg.pushManager.getSubscription();
     btn.disabled=false;
     if(sub&&Notification.permission==='granted'){btn.textContent='Desativar avisos';btn.dataset.on='1';st.textContent='Ativo neste celular. Você recebe um aviso quando o outro pagar e um lembrete no sábado às 9h e no domingo às 17h se faltar algum número seu.';}
-    else{btn.textContent='Ativar avisos';btn.dataset.on='';st.textContent=Notification.permission==='denied'?'As notificações estão bloqueadas para este site. Libere nas configurações do celular.':'Saiba na hora quando o outro pagar e receba um lembrete no fim de semana se faltar algum número seu.';}
+    else{btn.textContent='Ativar avisos';btn.dataset.on='';st.textContent=Notification.permission==='denied'?'As notificações estão bloqueadas neste celular. Toque em Ativar avisos para ver como liberar.':'Saiba na hora quando o outro pagar e receba um lembrete no fim de semana se faltar algum número seu.';}
   }catch(e){st.textContent='Não consegui verificar o lembrete.';}
 }
 async function alternarLembrete(){
-  const btn=$('btnLembrete');btn.disabled=true;
+  const btn=$('btnLembrete');
+  // o pedido de permissão precisa sair no mesmo instante do toque (iPhone recusa depois de um await)
+  const pedido=!btn.dataset.on&&Notification.permission==='default'?Notification.requestPermission():Promise.resolve(Notification.permission);
+  btn.disabled=true;
   try{
     const reg=await navigator.serviceWorker.ready;
     if(btn.dataset.on){const sub=await reg.pushManager.getSubscription();if(sub){await rpc('desinscrever',{p_endpoint:sub.endpoint}).catch(()=>{});await sub.unsubscribe();}toast('Avisos desativados');}
     else{
-      const perm=await Notification.requestPermission();
-      if(perm!=='granted'){toast('Sem permissão para notificar');return;}
+      const perm=await pedido;
+      if(perm!=='granted'){$('shPerm').hidden=false;return;}
       const sub=await reg.pushManager.getSubscription()||await reg.pushManager.subscribe({userVisibleOnly:true,applicationServerKey:b64(VAPID)});
       const j=sub.toJSON();
       const r=await rpc('inscrever',{...auth(),p_endpoint:j.endpoint,p_p256dh:j.keys.p256dh,p_auth:j.keys.auth});
@@ -802,6 +816,7 @@ $('btnCelOk').onclick=()=>$('shCel').hidden=true;
 $('btnCiclo').onclick=()=>{$('btnCiclo').hidden=true;$('btnCicloSim').hidden=false;};
 $('btnCicloSim').onclick=novoCiclo;
 $('btnLembrete').onclick=alternarLembrete;
+$('btnPermOk').onclick=()=>$('shPerm').hidden=true;
 $('btnCodigo').onclick=abrirTrocaCodigo;
 $('btnCodSim').onclick=confirmarTrocaCodigo;
 $('btnCodFechar').onclick=()=>$('shCod').hidden=true;$('btnCodFechar2').onclick=()=>$('shCod').hidden=true;
