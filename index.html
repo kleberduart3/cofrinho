@@ -238,7 +238,7 @@ input,select{font:inherit;font-weight:500;padding:12px 14px;border-radius:14px;b
 
 <!-- Novo cofrinho -->
 <section class="login" id="vNovo" hidden style="padding-top:calc(24px + env(safe-area-inset-top,0px))">
-  <h1>Novo<br><em>cofrinho</em></h1>
+  <h1 id="nTitulo">Novo<br><em>cofrinho</em></h1>
   <label for="nNome">Nome do cofrinho
     <input id="nNome" maxlength="40" placeholder="ex.: Viagem de férias"></label>
   <div style="display:flex;flex-direction:column;gap:6px">
@@ -340,8 +340,9 @@ input,select{font:inherit;font-weight:500;padding:12px 14px;border-radius:14px;b
     </details>
 
     <details id="cfg2">
-      <summary>Avisos e segurança</summary>
+      <summary>Cofrinho, avisos e segurança</summary>
       <div class="form">
+        <div class="opt"><b>Editar cofrinho</b><p class="note">Nome, pessoas, até que número vai e meta da semana.</p><button id="btnEditar">Editar</button></div>
         <div class="opt"><b>Avisos no celular</b><p class="note" id="lemStatus"></p><button id="btnLembrete">Ativar avisos</button></div>
         <div class="opt"><b>Código do cofrinho</b><p class="note">Se o link vazou, gere um código novo. O outro celular vai precisar entrar com ele.</p><button id="btnCodigo">Trocar código</button></div>
       </div>
@@ -468,6 +469,7 @@ input,select{font:inherit;font-weight:500;padding:12px 14px;border-radius:14px;b
   <div class="sheet-in" role="dialog" aria-modal="true" aria-labelledby="cofTitulo">
     <h2 id="cofTitulo">Seus cofrinhos<br><em>neste celular</em></h2>
     <div class="cofres" id="listaCofres"></div>
+    <button id="btnEditarLista">Editar este cofrinho</button>
     <button class="primary" id="btnNovoCofre">Criar novo cofrinho</button>
     <button id="btnEntrarOutro">Entrar com código</button>
   </div>
@@ -480,6 +482,15 @@ input,select{font:inherit;font-weight:500;padding:12px 14px;border-radius:14px;b
     <div class="code" id="criLink"></div>
     <button id="btnCriCopiar">Copiar link</button>
     <button class="primary" id="btnCriOk">Continuar</button>
+  </div>
+</div>
+<div class="sheet" id="shEdit" hidden>
+  <div class="sheet-in" role="dialog" aria-modal="true" aria-labelledby="edTitulo">
+    <h2 id="edTitulo">Tem certeza?<br><em>estas mudanças valem para todos</em></h2>
+    <ol class="steps" id="edLista"></ol>
+    <button class="primary" id="btnEdSim">Sim, alterar</button>
+    <button id="btnEdNao">Cancelar</button>
+    <p class="err" id="edErr" hidden></p>
   </div>
 </div>
 <canvas id="confete" hidden></canvas>
@@ -922,22 +933,46 @@ function mostrarLogin(){renderLoginCofres();show('vLogin');}
 
 // criação
 let nModo='num',nMeta=2;
-function linhaPessoa(v){
-  const d=document.createElement('div');d.className='prow';
+let editando=false;
+function linhaPessoa(v,de){
+  const d=document.createElement('div');d.className='prow';if(de)d.dataset.de=de;
   d.innerHTML='<input maxlength="30" placeholder="Nome" aria-label="Nome da pessoa"><button aria-label="Remover pessoa">×</button>';
   d.querySelector('input').value=v||'';d.querySelector('input').oninput=previaNovo;
-  d.querySelector('button').onclick=()=>{if($('nPessoas').children.length>1){d.remove();previaNovo();}};
+  d.querySelector('button').onclick=()=>{
+    if(editando&&de){
+      if(de===loc.pessoa){toast('Você não pode se remover do cofrinho.');return;}
+      if(Object.values(pagos).some(x=>x.pessoa===de)){toast(de+' já tem pagamentos e não pode sair.');return;}
+    }
+    if($('nPessoas').children.length>1){d.remove();previaNovo();}};
   $('nPessoas').appendChild(d);
 }
 function nomesNovo(){return [...$('nPessoas').querySelectorAll('input')].map(i=>i.value.trim()).filter(Boolean);}
+function prepararForm(ed){
+  editando=ed;
+  $('nTitulo').innerHTML=ed?'Editar<br><em>cofrinho</em>':'Novo<br><em>cofrinho</em>';
+  $('btnCriar').textContent=ed?'Salvar alterações':'Criar cofrinho';
+}
+function montarMetas(){
+  $('nMetas').innerHTML=[1,2,3,4,5].map(m=>'<button data-m="'+m+'" aria-pressed="'+(m===nMeta)+'">'+m+'</button>').join('');
+  $('nMetas').querySelectorAll('button').forEach(b=>b.onclick=()=>{nMeta=+b.dataset.m;$('nMetas').querySelectorAll('button').forEach(x=>x.setAttribute('aria-pressed',x===b));previaNovo();});
+}
+function abrirEditar(){
+  ['shCofres','cfg2'].forEach(id=>{if(id==='cfg2')$(id).open=false;else $(id).hidden=true;});
+  prepararForm(true);
+  $('nNome').value=info.nome;$('nPessoas').innerHTML='';
+  info.pessoas.forEach(p=>linhaPessoa(p,p));
+  nModo='num';$('nValor').value=info.maximo;nMeta=info.meta_semana||2;
+  if(nMeta>5)nMeta=5;
+  montarMetas();modoNovo('num');$('nErr').hidden=true;show('vNovo');scrollTo(0,0);
+}
 function abrirNovo(){
+  prepararForm(false);
   $('nNome').value='';$('nPessoas').innerHTML='';
   linhaPessoa(loc.pessoa||'');
   const outros=info?info.pessoas.filter(p=>p!==loc.pessoa):[];
   linhaPessoa(outros[0]||'');
   nModo='num';$('nValor').value=100;nMeta=2;
-  $('nMetas').innerHTML=[1,2,3,4,5].map(m=>'<button data-m="'+m+'" aria-pressed="'+(m===nMeta)+'">'+m+'</button>').join('');
-  $('nMetas').querySelectorAll('button').forEach(b=>b.onclick=()=>{nMeta=+b.dataset.m;$('nMetas').querySelectorAll('button').forEach(x=>x.setAttribute('aria-pressed',x===b));previaNovo();});
+  montarMetas();
   modoNovo('num');$('nErr').hidden=true;show('vNovo');scrollTo(0,0);
 }
 function modoNovo(m){
@@ -965,6 +1000,7 @@ function previaNovo(){
 }
 let criadoCod='';
 async function criarCofre(){
+  if(editando)return revisarEdicao();
   const nome=$('nNome').value.trim(),ps=nomesNovo(),{n}=calcNovo();
   const erro=t=>{$('nErr').textContent=t;$('nErr').hidden=false;};
   if(!nome)return erro('Dê um nome ao cofrinho.');
@@ -983,6 +1019,55 @@ async function criarCofre(){
   }catch(e){erro('Sem conexão. Tente de novo.');}
   finally{$('btnCriar').disabled=false;}
 }
+// edição
+let edDados=null;
+function revisarEdicao(){
+  const erro=t=>{$('nErr').textContent=t;$('nErr').hidden=false;};
+  const nome=$('nNome').value.trim(),{n,total}=calcNovo();
+  const linhas=[...$('nPessoas').children].map(d=>({de:d.dataset.de||null,para:d.querySelector('input').value.trim()}));
+  if(!nome)return erro('Dê um nome ao cofrinho.');
+  if(linhas.some(l=>!l.para))return erro('Preencha o nome de todas as pessoas ou remova a linha vazia.');
+  if(new Set(linhas.map(l=>l.para.toLowerCase())).size!==linhas.length)return erro('Os nomes das pessoas precisam ser diferentes.');
+  if(n<2||n>1000)return erro('O tamanho precisa ficar entre 2 e 1.000 números.');
+  const maior=Math.max(0,...Object.keys(pagos).map(Number));
+  if(n<maior)return erro('O número '+maior+' já foi pago, então o cofrinho precisa ir pelo menos até '+maior+'.');
+  const mud=[];
+  if(nome!==info.nome)mud.push('Nome: <b>'+esc(info.nome)+'</b> → <b>'+esc(nome)+'</b>');
+  if(n!==info.maximo)mud.push('Números: de 1 a <b>'+info.maximo+'</b> → de 1 a <b>'+n+'</b>. Total final passa de '+brl(total_(info.maximo))+' para <b>'+brl(total)+'</b>.');
+  if(nMeta!==(info.meta_semana||2))mud.push('Meta por pessoa: <b>'+(info.meta_semana||2)+'</b> → <b>'+nMeta+'</b> números por semana');
+  linhas.forEach(l=>{if(l.de&&l.de!==l.para)mud.push('Renomear <b>'+esc(l.de)+'</b> para <b>'+esc(l.para)+'</b>. Os pagamentos dele(a) continuam.');if(!l.de)mud.push('Adicionar <b>'+esc(l.para)+'</b>. Vai criar o próprio PIN ao entrar.');});
+  info.pessoas.filter(p=>!linhas.some(l=>l.de===p)).forEach(p=>mud.push('Remover <b>'+esc(p)+'</b> do cofrinho'));
+  const ordem=linhas.map(l=>l.de||'').join('|')!==info.pessoas.join('|')&&!linhas.some(l=>!l.de)&&linhas.length===info.pessoas.length;
+  if(ordem)mud.push('Nova ordem das pessoas (muda as cores)');
+  if(!mud.length)return erro('Nada mudou.');
+  $('nErr').hidden=true;
+  edDados={p_nome:nome,p_maximo:n,p_meta:nMeta,p_pessoas:linhas};
+  $('edLista').innerHTML=mud.map(m=>'<li>'+m+'</li>').join('');
+  $('edErr').hidden=true;$('toast').hidden=true;$('shEdit').hidden=false;
+}
+const total_=m=>m*(m+1)/2;
+async function salvarEdicao(){
+  $('btnEdSim').disabled=true;
+  try{
+    const r=await rpc('editar_desafio',{...auth(),...edDados});
+    if(!r.ok){
+      const t=r.erro==='maximo_menor'?'O número '+r.maior+' já foi pago, então o cofrinho precisa ir pelo menos até ele.':
+        r.erro==='pessoa_com_pagamentos'?r.pessoa+' já tem pagamentos e não pode sair do cofrinho.':
+        r.erro==='nao_remover_voce'?'Você não pode se remover do cofrinho.':
+        r.erro==='pessoas'?'Confira os nomes das pessoas.':erroTexto(r.erro);
+      $('edErr').textContent=t;$('edErr').hidden=false;
+      if(['pin_incorreto','sem_pin','codigo'].includes(r.erro)){$('shEdit').hidden=true;tratarErro(r.erro);}
+      return;
+    }
+    loc.pessoa=r.voce||loc.pessoa;saveLoc();
+    $('shEdit').hidden=true;editando=false;limparEstado();
+    await entrar(loc.codigo);toast('Cofrinho atualizado');
+  }catch(e){$('edErr').textContent='Sem conexão. Tente de novo.';$('edErr').hidden=false;}
+  finally{$('btnEdSim').disabled=false;}
+}
+$('btnEditar').onclick=abrirEditar;$('btnEditarLista').onclick=abrirEditar;
+$('btnEdSim').onclick=salvarEdicao;$('btnEdNao').onclick=()=>$('shEdit').hidden=true;
+$('shEdit').addEventListener('click',e=>{if(e.target.id==='shEdit')$('shEdit').hidden=true;});
 $('nModoNum').onclick=()=>modoNovo('num');$('nModoValor').onclick=()=>modoNovo('valor');
 $('nValor').oninput=previaNovo;
 $('nAddPessoa').onclick=()=>{if($('nPessoas').children.length<4){linhaPessoa('');previaNovo();}else toast('Até 4 pessoas por cofrinho');};
