@@ -10,7 +10,7 @@
       <rect x="0" y="0" width="512" height="512" fill="#fff"/>
       <rect x="300" y="148" width="74" height="14" rx="7" fill="#000" transform="rotate(18 337 155)"/>
     </mask>
-    <style>.moeda{fill:#0d0d0d}@media (prefers-color-scheme:dark){.moeda{fill:#f2f1ee}}</style>
+    <style>.moeda{fill:#0d0d0d}</style>
   </defs>
   <g mask="url(#fenda)"><g clip-path="url(#coracao)">
     <rect x="60" y="90" width="400" height="360" fill="#f7a21b"/>

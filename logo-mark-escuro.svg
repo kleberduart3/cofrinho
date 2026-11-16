@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="86 60 340 362">
+  <defs>
+    <clipPath id="coracao">
+      <path d="M256 418 C 150 350, 92 286, 92 214 C 92 158, 134 118, 186 118 C 218 118, 242 134, 256 158 C 270 134, 294 118, 326 118 C 378 118, 420 158, 420 214 C 420 286, 362 350, 256 418 Z"/>
+    </clipPath>
+    <filter id="desfoque" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="34"/>
+    </filter>
+    <mask id="fenda">
+      <rect x="0" y="0" width="512" height="512" fill="#fff"/>
+      <rect x="300" y="148" width="74" height="14" rx="7" fill="#000" transform="rotate(18 337 155)"/>
+    </mask>
+    <style>.moeda{fill:#f2f1ee}</style>
+  </defs>
+  <g mask="url(#fenda)"><g clip-path="url(#coracao)">
+    <rect x="60" y="90" width="400" height="360" fill="#f7a21b"/>
+    <g filter="url(#desfoque)">
+      <circle cx="170" cy="190" r="120" fill="#e2231a"/>
+      <circle cx="350" cy="170" r="95" fill="#f7a21b"/>
+      <circle cx="300" cy="330" r="95" fill="#e9e77d"/>
+      <circle cx="200" cy="360" r="70" fill="#e2231a" opacity=".7"/>
+    </g>
+  </g></g>
+  <!-- moeda -->
+  <circle class="moeda" cx="352" cy="92" r="26"/>
+</svg>

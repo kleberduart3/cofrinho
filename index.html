@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#ebeae6">
 <title>Cofrinho do Casal</title>
+<script>try{var t=JSON.parse(localStorage.getItem('cofrinhoCasal')||'{}').tema;if(t==='claro')document.documentElement.dataset.theme='light';else if(t==='escuro')document.documentElement.dataset.theme='dark';}catch(e){}</script>
 <link rel="manifest" href="manifest.webmanifest?v=4">
 <link rel="icon" type="image/svg+xml" href="logo.svg?v=4">
 <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png?v=4">
@@ -25,11 +26,15 @@
   --card-ink:#0d0d0d; --on-ink:#ffffff; --err:#c4170f; --scrim:rgba(13,13,13,.5);
   --sandl:#d2b07a; --sky:#a9bfd0;
   --font:"Inter Tight","Helvetica Neue",Helvetica,Arial,sans-serif;
+  --hero-ink:var(--card-ink);
   color-scheme:light;
 }
-@media (prefers-color-scheme:dark){:root{
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
   --bg:#0f0f0e; --surface:#1b1b1a; --soft:#2a2a28; --ink:#f2f1ee; --muted:#7d7a74; --line:#2c2c2a;
-  --hero:#3b3935; --on-ink:#0d0d0d; --err:#ff6b63; --scrim:rgba(0,0,0,.65); color-scheme:dark}}
+  --hero:#3b3935; --on-ink:#0d0d0d; --err:#ff6b63; --scrim:rgba(0,0,0,.65); --hero-ink:var(--ink); color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0f0f0e; --surface:#1b1b1a; --soft:#2a2a28; --ink:#f2f1ee; --muted:#7d7a74; --line:#2c2c2a;
+  --hero:#3b3935; --on-ink:#0d0d0d; --err:#ff6b63; --scrim:rgba(0,0,0,.65); --hero-ink:var(--ink); color-scheme:dark}
 *{box-sizing:border-box}
 html{-webkit-text-size-adjust:100%}
 body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--font);font-size:15px;line-height:1.4;font-weight:500;letter-spacing:-.01em}
@@ -46,8 +51,7 @@ h2{font-weight:700;font-size:1.25rem;margin:0;line-height:1.1;letter-spacing:-.0
 .who b{color:var(--ink);font-weight:600}
 .eyebrow{font-size:.78rem;color:inherit;opacity:.65;margin:0;font-weight:600}
 /* cartão principal */
-.hero-card{position:relative;overflow:hidden;background:var(--hero);color:var(--card-ink);border-radius:30px;padding:20px 20px 22px;min-height:190px;display:flex;flex-direction:column;justify-content:flex-end;gap:2px;isolation:isolate}
-@media (prefers-color-scheme:dark){.hero-card{color:var(--ink)}}
+.hero-card{position:relative;overflow:hidden;background:var(--hero);color:var(--hero-ink);border-radius:30px;padding:20px 20px 22px;min-height:190px;display:flex;flex-direction:column;justify-content:flex-end;gap:2px;isolation:isolate}
 .hero-card .blob{position:absolute;border-radius:50%;filter:blur(18px);z-index:-1}
 .hero-card .b1{width:150px;height:150px;background:var(--red);top:-30px;right:40px;opacity:.9}
 .hero-card .b2{width:130px;height:130px;background:var(--orange);top:10px;right:-20px;opacity:.95}
@@ -174,11 +178,11 @@ input,select{font:inherit;font-weight:500;padding:12px 14px;border-radius:14px;b
 .cofre.atual{background:var(--ink);color:var(--on-ink)}
 .cofre small{display:block;font-weight:500;opacity:.6;font-size:.78rem}
 .cofre .x{background:none;padding:4px 8px;color:inherit;opacity:.5;font-size:.8rem}
+.seg.tema{grid-template-columns:1fr 1fr 1fr}
 .seg{display:grid;grid-template-columns:1fr 1fr;background:var(--soft);border-radius:999px;padding:4px;gap:4px}
 .seg button{background:transparent;padding:10px}
 .seg button[aria-pressed="true"]{background:var(--ink);color:var(--on-ink)}
-.prev{background:var(--hero);color:var(--card-ink);border-radius:22px;padding:16px 18px;display:flex;flex-direction:column;gap:4px;position:relative;overflow:hidden;isolation:isolate}
-@media (prefers-color-scheme:dark){.prev{color:var(--ink)}}
+.prev{background:var(--hero);color:var(--hero-ink);border-radius:22px;padding:16px 18px;display:flex;flex-direction:column;gap:4px;position:relative;overflow:hidden;isolation:isolate}
 .prev b{font-size:1.9rem;font-weight:700;letter-spacing:-.04em;line-height:1.05}
 .prev small{font-weight:600;opacity:.7}
 .prev .blob{position:absolute;border-radius:50%;filter:blur(16px);z-index:-1}
@@ -195,7 +199,7 @@ input,select{font:inherit;font-weight:500;padding:12px 14px;border-radius:14px;b
 
 <!-- Tela de entrada -->
 <section class="login" id="vLogin" hidden>
-  <img class="logo" src="logo-mark.svg?v=4" alt="">
+  <img class="logo" src="logo-mark.svg?v=5" data-logo alt="">
   <h1>Cofrinho<br><em>juntos</em></h1>
   <div class="cofres" id="loginCofres" hidden></div>
   <p class="sub">Entre com o código de um cofrinho que já existe ou crie um novo.</p>
@@ -213,14 +217,14 @@ input,select{font:inherit;font-weight:500;padding:12px 14px;border-radius:14px;b
 
 <!-- Escolha de pessoa -->
 <section class="login" id="vWho" hidden>
-  <img class="logo" src="logo-mark.svg?v=4" alt="">
+  <img class="logo" src="logo-mark.svg?v=5" data-logo alt="">
   <h1>Quem está<br><em>neste celular?</em></h1>
   <div class="row" id="whoBtns"></div>
 </section>
 
 <!-- PIN -->
 <section class="login" id="vPin" hidden>
-  <img class="logo" src="logo-mark.svg?v=4" alt="">
+  <img class="logo" src="logo-mark.svg?v=5" data-logo alt="">
   <h1 id="pinTitulo">Digite seu PIN</h1>
   <p class="sub" id="pinSub"></p>
   <label for="fPin">PIN
@@ -269,7 +273,7 @@ input,select{font:inherit;font-weight:500;padding:12px 14px;border-radius:14px;b
   <div class="wrap">
     <header class="top">
       <div class="brand">
-        <img src="logo-mark.svg?v=4" alt="">
+        <img src="logo-mark.svg?v=5" data-logo alt="">
         <div><button class="switch" id="btnCofres" aria-label="Trocar de cofrinho"><h1><span id="tNome">Cofrinho</span><br><em>cofrinho</em></h1><span class="chev" aria-hidden="true">▼</span></button><p class="sub num" id="tSub"></p></div>
       </div>
       <div class="who">Você é <b id="tWho"></b><br><button id="btnTroca" style="padding:6px 12px;font-size:.78rem;margin-top:6px">Trocar</button></div>
@@ -322,6 +326,16 @@ input,select{font:inherit;font-weight:500;padding:12px 14px;border-radius:14px;b
           <input id="fCity" maxlength="15" placeholder="ex.: Arapiraca"></label>
         <button class="primary" id="btnSave">Salvar</button>
         <p class="note">Celular vai como +55 com DDD, CPF só números. Esses dados ficam só neste aparelho.</p>
+      </div>
+    </details>
+
+    <details id="cfgTema">
+      <summary>Aparência</summary>
+      <div class="form">
+        <div class="seg tema" role="group" aria-label="Tema" id="segTema">
+          <button data-t="auto">Automático</button><button data-t="claro">Claro</button><button data-t="escuro">Escuro</button>
+        </div>
+        <p class="note">Automático segue o modo claro ou escuro do celular.</p>
       </div>
     </details>
 
@@ -972,6 +986,21 @@ async function criarCofre(){
 $('nModoNum').onclick=()=>modoNovo('num');$('nModoValor').onclick=()=>modoNovo('valor');
 $('nValor').oninput=previaNovo;
 $('nAddPessoa').onclick=()=>{if($('nPessoas').children.length<4){linhaPessoa('');previaNovo();}else toast('Até 4 pessoas por cofrinho');};
+
+/* ---------- Tema ---------- */
+const mqEscuro=matchMedia('(prefers-color-scheme: dark)');
+function temaEfetivo(){return loc.tema==='claro'?'claro':loc.tema==='escuro'?'escuro':(mqEscuro.matches?'escuro':'claro');}
+function aplicarTema(){
+  const r=document.documentElement;
+  if(loc.tema==='claro')r.dataset.theme='light';else if(loc.tema==='escuro')r.dataset.theme='dark';else delete r.dataset.theme;
+  const esc=temaEfetivo()==='escuro';
+  document.querySelectorAll('img[data-logo]').forEach(i=>i.src=esc?'logo-mark-escuro.svg?v=5':'logo-mark.svg?v=5');
+  document.querySelector('meta[name=theme-color]').content=esc?'#0f0f0e':'#ebeae6';
+  document.querySelectorAll('#segTema button').forEach(b=>b.setAttribute('aria-pressed',b.dataset.t===(loc.tema||'auto')));
+}
+document.querySelectorAll('#segTema button').forEach(b=>b.onclick=()=>{loc.tema=b.dataset.t==='auto'?'':b.dataset.t;saveLoc();aplicarTema();});
+mqEscuro.addEventListener?.('change',aplicarTema);
+aplicarTema();
 
 /* ---------- Eventos ---------- */
 $('btnEntrar').onclick=()=>{const c=$('fCodigo').value.trim();if(c)entrar(c);};
