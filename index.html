@@ -192,6 +192,27 @@ input,select{font:inherit;font-weight:500;padding:12px 14px;border-radius:14px;b
 .metas{display:flex;gap:6px;flex-wrap:wrap}
 .metas button{padding:10px 16px}
 .metas button[aria-pressed="true"]{background:var(--ink);color:var(--on-ink)}
+/* menu */
+.menu-btn{width:44px;height:44px;border-radius:50%;padding:0;display:flex;flex-direction:column;justify-content:center;align-items:center;gap:4px;flex:none;background:var(--surface)}
+.menu-btn i{display:block;width:18px;height:2px;border-radius:2px;background:var(--ink)}
+.drawer-bg{position:fixed;inset:0;background:var(--scrim);z-index:25;display:flex;justify-content:flex-end}
+.drawer{width:min(88vw,380px);height:100%;background:var(--surface);overflow:auto;display:flex;flex-direction:column;gap:18px;
+  padding-top:calc(20px + env(safe-area-inset-top,0px));padding-bottom:calc(20px + env(safe-area-inset-bottom,0px));padding-left:20px;padding-right:max(20px,env(safe-area-inset-right,0px));
+  border-radius:28px 0 0 28px;animation:entra .22s ease-out}
+@keyframes entra{from{transform:translateX(40px);opacity:.4}to{transform:none;opacity:1}}
+@media (prefers-reduced-motion:reduce){.drawer{animation:none}}
+.dr-head{display:flex;justify-content:space-between;align-items:flex-start}
+.dr-x{width:40px;height:40px;padding:0;border-radius:50%;background:var(--bg);font-size:.9rem}
+.dr-acts{display:flex;flex-direction:column;gap:8px}
+.dr-sec{display:flex;flex-direction:column;gap:6px;border-top:1px solid var(--line);padding-top:14px}
+.dr-sec>small{color:var(--muted);font-weight:600;font-size:.75rem;margin-bottom:2px}
+.dr-item{display:flex;justify-content:space-between;align-items:baseline;gap:10px;background:none;border-radius:14px;padding:10px 6px;text-align:left}
+.dr-item:hover{background:var(--bg)}
+.dr-item span{font-weight:600}
+.dr-item em{font-style:normal;color:var(--muted);font-size:.8rem;text-align:right}
+.dr-sair{margin-top:auto}
+.dr-item.sair span{color:var(--err)}
+button.perigo{background:var(--err);color:#fff}
 [hidden]{display:none!important}
 </style>
 </head>
@@ -274,9 +295,9 @@ input,select{font:inherit;font-weight:500;padding:12px 14px;border-radius:14px;b
     <header class="top">
       <div class="brand">
         <img src="logo-mark.svg?v=5" data-logo alt="">
-        <div><button class="switch" id="btnCofres" aria-label="Trocar de cofrinho"><h1><span id="tNome">Cofrinho</span><br><em>cofrinho</em></h1><span class="chev" aria-hidden="true">▼</span></button><p class="sub num" id="tSub"></p></div>
+        <div><button class="switch" id="btnCofres" aria-label="Escolher cofrinho"><h1><span id="tNome">Cofrinho</span><br><em>cofrinho</em></h1><span class="chev" aria-hidden="true">▼</span></button><p class="sub num" id="tSub"></p></div>
       </div>
-      <div class="who">Você é <b id="tWho"></b><br><button id="btnTroca" style="padding:6px 12px;font-size:.78rem;margin-top:6px">Trocar</button></div>
+      <button class="menu-btn" id="btnMenu" aria-label="Abrir menu" aria-controls="drawer" aria-expanded="false"><i></i><i></i><i></i></button>
     </header>
 
 <div class="install" id="instBar" hidden>
@@ -465,13 +486,42 @@ input,select{font:inherit;font-weight:500;padding:12px 14px;border-radius:14px;b
     <button class="primary" id="btnPermOk">Entendi</button>
   </div>
 </div>
-<div class="sheet" id="shCofres" hidden>
-  <div class="sheet-in" role="dialog" aria-modal="true" aria-labelledby="cofTitulo">
-    <h2 id="cofTitulo">Seus cofrinhos<br><em>neste celular</em></h2>
+<div class="drawer-bg" id="shCofres" hidden>
+  <nav class="drawer" id="drawer" aria-label="Menu" role="dialog" aria-modal="true">
+    <div class="dr-head">
+      <h2>Seus<br><em>cofrinhos</em></h2>
+      <button class="dr-x" id="btnMenuFechar" aria-label="Fechar menu">✕</button>
+    </div>
     <div class="cofres" id="listaCofres"></div>
-    <button id="btnEditarLista">Editar este cofrinho</button>
-    <button class="primary" id="btnNovoCofre">Criar novo cofrinho</button>
-    <button id="btnEntrarOutro">Entrar com código</button>
+    <div class="dr-acts">
+      <button class="primary" id="btnNovoCofre">+ Novo cofrinho</button>
+      <button id="btnEntrarOutro">Entrar com código</button>
+    </div>
+    <div class="dr-sec">
+      <small>Neste cofrinho</small>
+      <button class="dr-item" id="btnEditarLista"><span>Editar cofrinho</span><em>nome, pessoas, meta</em></button>
+      <button class="dr-item" id="btnTroca"><span>Trocar pessoa</span><em id="tWho"></em></button>
+      <button class="dr-item" id="btnMenuAvisos"><span>Avisos e segurança</span><em>notificações, código</em></button>
+      <button class="dr-item" id="btnMenuPix"><span>Dados do Pix</span><em>chave deste celular</em></button>
+    </div>
+    <div class="dr-sec">
+      <small>Aparência</small>
+      <div class="seg tema" role="group" aria-label="Tema" id="segTema2">
+        <button data-t="auto">Auto</button><button data-t="claro">Claro</button><button data-t="escuro">Escuro</button>
+      </div>
+    </div>
+    <div class="dr-sec dr-sair">
+      <button class="dr-item sair" id="btnSair"><span>Sair</span><em>deste celular</em></button>
+    </div>
+  </nav>
+</div>
+<div class="sheet" id="shSair" hidden>
+  <div class="sheet-in" role="dialog" aria-modal="true" aria-labelledby="sairTitulo">
+    <h2 id="sairTitulo">Sair<br><em>deste celular</em></h2>
+    <p class="note" id="sairTexto"></p>
+    <button id="btnSairUm">Sair deste cofrinho</button>
+    <button class="perigo" id="btnSairTodos">Sair de todos os cofrinhos</button>
+    <button id="btnSairNao">Cancelar</button>
   </div>
 </div>
 <div class="sheet" id="shCriado" hidden>
@@ -672,7 +722,7 @@ function render(){
   document.querySelectorAll('#stackP [data-p]').forEach(e=>e.textContent=brl(por[+e.dataset.p]));
   const livres=info.maximo-n;
   $('sFalta').textContent=brl(T-t);$('sLivres').textContent=livres+(livres===1?' número livre':' números livres');
-  $('tSub').textContent='Números de 1 a '+info.maximo+(info.ciclo>1?'  ·  ciclo '+info.ciclo:'');
+  $('tSub').textContent='Números de 1 a '+info.maximo+(info.ciclo>1?'  ·  ciclo '+info.ciclo:'')+'  ·  você é '+loc.pessoa;
   $('pFim').hidden=livres>0;
   desenharAtividade();desenharMeta();
   document.querySelectorAll('.chip').forEach(c=>{
@@ -915,12 +965,13 @@ function itemCofre(c,atual){
   b.innerHTML='<div><span>'+esc(c.nome||'Cofrinho')+'</span><small>'+(c.pessoa?'Você é '+esc(c.pessoa):'Entrar')+'</small></div>'+(atual?'<small>Aberto</small>':'<button class="x" aria-label="Remover deste celular">Remover</button>');
   b.onclick=e=>{if(e.target.classList.contains('x')){e.stopPropagation();
       if(e.target.dataset.c){esquecerCofre(c.codigo);saveLoc();abrirListaCofres(true);renderLoginCofres();}else{e.target.dataset.c='1';e.target.textContent='Remover?';}return;}
-    if(!atual)abrirCofre(c.codigo);else $('shCofres').hidden=true;};
+    if(!atual)abrirCofre(c.codigo);else fecharMenu();};
   b.onkeydown=e=>{if(e.key==='Enter')b.click();};
   return b;
 }
 function abrirListaCofres(manter){
   saveLoc();const l=$('listaCofres');l.innerHTML='';
+  $('tWho').textContent=loc.pessoa?'você é '+loc.pessoa:'';$('btnMenu').setAttribute('aria-expanded','true');
   loc.cofres.forEach(c=>l.appendChild(itemCofre(c,c.codigo===loc.codigo)));
   $('shCofres').hidden=false;
 }
@@ -1081,9 +1132,9 @@ function aplicarTema(){
   const esc=temaEfetivo()==='escuro';
   document.querySelectorAll('img[data-logo]').forEach(i=>i.src=esc?'logo-mark-escuro.svg?v=5':'logo-mark.svg?v=5');
   document.querySelector('meta[name=theme-color]').content=esc?'#0f0f0e':'#ebeae6';
-  document.querySelectorAll('#segTema button').forEach(b=>b.setAttribute('aria-pressed',b.dataset.t===(loc.tema||'auto')));
+  document.querySelectorAll('#segTema button,#segTema2 button').forEach(b=>b.setAttribute('aria-pressed',b.dataset.t===(loc.tema||'auto')));
 }
-document.querySelectorAll('#segTema button').forEach(b=>b.onclick=()=>{loc.tema=b.dataset.t==='auto'?'':b.dataset.t;saveLoc();aplicarTema();});
+document.querySelectorAll('#segTema button,#segTema2 button').forEach(b=>b.onclick=()=>{loc.tema=b.dataset.t==='auto'?'':b.dataset.t;saveLoc();aplicarTema();});
 mqEscuro.addEventListener?.('change',aplicarTema);
 aplicarTema();
 
@@ -1095,10 +1146,40 @@ $('btnPin').onclick=enviarPin;
 $('fPin').addEventListener('input',()=>{if(!criandoPin&&$('fPin').value.length===4)enviarPin();else if(criandoPin&&$('fPin').value.length===4)$('fPin2').focus();});
 $('fPin2').addEventListener('input',()=>{if($('fPin2').value.length===4)enviarPin();});
 $('btnPinVoltar').onclick=escolherPessoa;
-$('btnTroca').onclick=()=>{loc.pin='';saveLoc();escolherPessoa();};
+function fecharMenu(){$('shCofres').hidden=true;$('btnMenu').setAttribute('aria-expanded','false');}
+$('btnTroca').onclick=()=>{fecharMenu();loc.pin='';saveLoc();escolherPessoa();};
+$('btnMenu').onclick=abrirListaCofres;$('btnMenuFechar').onclick=fecharMenu;
+function abrirDetalhe(id){fecharMenu();const d=$(id);d.open=true;setTimeout(()=>d.scrollIntoView({behavior:'smooth',block:'start'}),50);}
+$('btnMenuAvisos').onclick=()=>abrirDetalhe('cfg2');$('btnMenuPix').onclick=()=>abrirDetalhe('cfg');
+document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!$('shCofres').hidden)fecharMenu();});
+// sair
+async function tirarAvisos(codigos){
+  try{const reg=await navigator.serviceWorker?.getRegistration();const sub=reg&&await reg.pushManager.getSubscription();
+    if(!sub)return;for(const c of codigos)await rpc('desinscrever_cofre',{p_codigo:c,p_endpoint:sub.endpoint}).catch(()=>{});
+    return sub;}catch(e){}
+}
+$('btnSair').onclick=()=>{fecharMenu();
+  $('sairTexto').textContent='Sair deste cofrinho tira '+(info?'"'+info.nome+'"':'o cofrinho')+' deste celular e esquece o seu PIN aqui. Sair de todos limpa todos os cofrinhos deste celular. Os pagamentos continuam salvos e você pode entrar de novo com o código e o PIN.';
+  $('btnSairTodos').hidden=loc.cofres.length<2;$('btnSairUm').textContent=loc.cofres.length<2?'Sair':'Sair deste cofrinho';
+  $('shSair').hidden=false;};
+$('btnSairNao').onclick=()=>$('shSair').hidden=true;
+$('shSair').addEventListener('click',e=>{if(e.target.id==='shSair')$('shSair').hidden=true;});
+$('btnSairUm').onclick=async()=>{
+  $('btnSairUm').disabled=true;const c=loc.codigo;await tirarAvisos([c]);
+  esquecerCofre(c);limparEstado();loc.codigo='';loc.pessoa='';loc.pin='';
+  try{localStorage.setItem(LS,JSON.stringify(loc))}catch(e){}
+  $('shSair').hidden=true;$('btnSairUm').disabled=false;
+  if(loc.cofres.length)abrirCofre(loc.cofres[0].codigo);else mostrarLogin();
+  toast('Você saiu do cofrinho');};
+$('btnSairTodos').onclick=async()=>{
+  $('btnSairTodos').disabled=true;const sub=await tirarAvisos(loc.cofres.map(x=>x.codigo));
+  try{await sub?.unsubscribe();}catch(e){}
+  loc.cofres=[];limparEstado();loc.codigo='';loc.pessoa='';loc.pin='';
+  try{localStorage.setItem(LS,JSON.stringify(loc))}catch(e){}
+  $('shSair').hidden=true;$('btnSairTodos').disabled=false;mostrarLogin();toast('Você saiu de todos os cofrinhos');};
 $('btnCofres').onclick=abrirListaCofres;
-$('btnNovoCofre').onclick=()=>{$('shCofres').hidden=true;abrirNovo();};
-$('btnEntrarOutro').onclick=()=>{$('shCofres').hidden=true;saveLoc();limparEstado();loc.codigo='';loc.pessoa='';loc.pin='';mostrarLogin();};
+$('btnNovoCofre').onclick=()=>{fecharMenu();abrirNovo();};
+$('btnEntrarOutro').onclick=()=>{fecharMenu();saveLoc();limparEstado();loc.codigo='';loc.pessoa='';loc.pin='';mostrarLogin();};
 $('btnCriarLogin').onclick=abrirNovo;
 $('btnNovoVoltar').onclick=()=>{if(loc.codigo&&info)show('vApp');else mostrarLogin();};
 $('btnCriar').onclick=criarCofre;
